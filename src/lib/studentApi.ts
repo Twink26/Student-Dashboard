@@ -10,7 +10,7 @@ import { isStudentApiError } from "./studentTypes";
 // ---------------------------------------------------------------------------
 const APPS_SCRIPT_WEB_APP_URL: string =
   import.meta.env.VITE_APPS_SCRIPT_WEB_APP_URL ??
-  "https://script.google.com/a/macros/newtonschool.co/s/AKfycbzi2sfsgnWDlgULMMYUJhafrJ2KDQfH--qzcnqY1jW44skau8tJ0PkgwT7WztaRglx7Ig/exec";
+  "https://script.google.com/macros/s/AKfycbyzLDMkZm0p7R1Gm8IUY9H0LMS_s0WE86FdE47jt7U6M817sP0m597XDPaL8S4-Vxu4Og/exec";
 
 export class StudentNotFoundError extends Error {
   constructor(message = "Student not found") {
