@@ -8,15 +8,21 @@ import { isStudentApiError } from "./studentTypes";
 // Set VITE_APPS_SCRIPT_WEB_APP_URL in a .env file to override without
 // touching code (see .env.example).
 // ---------------------------------------------------------------------------
-const APPS_SCRIPT_WEB_APP_URL: string =
-  import.meta.env.VITE_APPS_SCRIPT_WEB_APP_URL ??
+const rawEnvUrl = import.meta.env.VITE_APPS_SCRIPT_WEB_APP_URL;
+const HARDCODED_FALLBACK_URL =
   "https://script.google.com/macros/s/AKfycbyzLDMkZm0p7R1Gm8IUY9H0LMS_s0WE86FdE47jt7U6M817sP0m597XDPaL8S4-Vxu4Og/exec";
+
+// Treat an empty/whitespace-only env var the same as an unset one — Vercel
+// (or any host) can end up with the variable present but blank, and `??`
+// alone does not fall back for an empty string, only null/undefined.
+const APPS_SCRIPT_WEB_APP_URL: string =
+  rawEnvUrl && rawEnvUrl.trim().length > 0 ? rawEnvUrl : HARDCODED_FALLBACK_URL;
 
 // TEMPORARY DIAGNOSTIC LOGGING — confirms whether the Vercel env var actually
 // made it into this build, vs. silently falling back to the hardcoded URL.
 console.log(
   "Using Apps Script URL from:",
-  import.meta.env.VITE_APPS_SCRIPT_WEB_APP_URL ? "environment variable" : "hardcoded fallback",
+  rawEnvUrl && rawEnvUrl.trim().length > 0 ? "environment variable" : "hardcoded fallback",
   "→",
   APPS_SCRIPT_WEB_APP_URL
 );
