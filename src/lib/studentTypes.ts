@@ -63,6 +63,40 @@ export function isStudentApiError(
 }
 
 // ---------------------------------------------------------------------------
+// Section analytics API types (?view=sections)
+// ---------------------------------------------------------------------------
+
+export interface StudentSummaryApiResponse {
+  studentId: string;
+  name: string;
+  enrollment: string;
+  overallAttendance: number | null;
+  avgAssessmentPerformance: number | null;
+  avgAssignmentCompletion: number | null;
+}
+
+export interface BatchAnalyticsApiResponse {
+  batch: string;
+  studentCount: number;
+  avgOverallAttendance: number | null;
+  avgAssessmentPerformance: number | null;
+  avgAssignmentCompletion: number | null;
+  students: StudentSummaryApiResponse[];
+}
+
+export interface SectionAnalyticsApiResponse {
+  batches: BatchAnalyticsApiResponse[];
+}
+
+export type SectionAnalyticsApiResult = SectionAnalyticsApiResponse | StudentApiErrorResponse;
+
+export function isSectionAnalyticsApiError(
+  result: SectionAnalyticsApiResult
+): result is StudentApiErrorResponse {
+  return (result as StudentApiErrorResponse).error !== undefined;
+}
+
+// ---------------------------------------------------------------------------
 // Internal frontend model. Components only ever see these shapes — they have
 // no knowledge of the Apps Script / Google Sheet field names.
 // ---------------------------------------------------------------------------
@@ -116,3 +150,30 @@ export interface Student {
 }
 
 export type AttendanceStatus = "excellent" | "good" | "needs-attention" | "unknown";
+
+// ---------------------------------------------------------------------------
+// Internal model for Section Analytics — components consume these, never the
+// raw *ApiResponse shapes above.
+// ---------------------------------------------------------------------------
+
+export interface StudentSummary {
+  studentId: string;
+  name: string;
+  enrollment: string;
+  overallAttendance: number | null;
+  avgAssessmentPerformance: number | null;
+  avgAssignmentCompletion: number | null;
+}
+
+export interface BatchAnalytics {
+  batch: string;
+  studentCount: number;
+  avgOverallAttendance: number | null;
+  avgAssessmentPerformance: number | null;
+  avgAssignmentCompletion: number | null;
+  students: StudentSummary[];
+}
+
+export interface SectionAnalytics {
+  batches: BatchAnalytics[];
+}

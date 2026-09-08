@@ -1,5 +1,10 @@
-import type { StudentApiResponse, StudentApiResult } from "./studentTypes";
-import { isStudentApiError } from "./studentTypes";
+import type {
+  StudentApiResponse,
+  StudentApiResult,
+  SectionAnalyticsApiResponse,
+  SectionAnalyticsApiResult,
+} from "./studentTypes";
+import { isStudentApiError, isSectionAnalyticsApiError } from "./studentTypes";
 
 // ---------------------------------------------------------------------------
 // Single place the Apps Script Web App URL lives. Everything else imports
@@ -93,4 +98,40 @@ export async function fetchStudent(studentId: string): Promise<StudentApiRespons
   }
 
   return data as StudentApiResponse;
+}
+
+/**
+ * Fetches the section-wise (batch) analytics from the Apps Script JSON API.
+ * Throws StudentApiNetworkError for any network / parsing / unexpected failure.
+ */
+export async function fetchSectionAnalytics(): Promise<SectionAnalyticsApiResponse> {
+  const url = `${APPS_SCRIPT_WEB_APP_URL}?view=sections`;
+
+  let response: Response;
+  try {
+    response = await fetch(url, { method: "GET" });
+  } catch {
+    throw new StudentApiNetworkError();
+  }
+
+  if (!response.ok) {
+    throw new StudentApiNetworkError();
+  }
+
+  let data: SectionAnalyticsApiResult;
+  try {
+    data = (await response.json()) as SectionAnalyticsApiResult;
+  } catch {
+    throw new StudentApiNetworkError();
+  }
+
+  if (isSectionAnalyticsApiError(data)) {
+    throw new StudentApiNetworkError();
+  }
+
+  if (!data || !Array.isArray(data.batches)) {
+    throw new StudentApiNetworkError();
+  }
+
+  return data;
 }
