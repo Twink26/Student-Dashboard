@@ -2,10 +2,16 @@ import type {
   StudentApiResponse,
   SubjectApiResponse,
   AssessmentApiResponse,
+  SectionAnalyticsApiResponse,
+  BatchAnalyticsApiResponse,
+  StudentSummaryApiResponse,
   Subject,
   Student,
   Performance,
   Assessment,
+  SectionAnalytics,
+  BatchAnalytics,
+  StudentSummary,
 } from "./studentTypes";
 
 function average(values: Array<number | null | undefined>): number | null {
@@ -81,5 +87,40 @@ export function adaptStudentResponse(response: StudentApiResponse): Student {
     },
     performance,
     assessments,
+  };
+}
+
+function adaptStudentSummary(summary: StudentSummaryApiResponse): StudentSummary {
+  return {
+    studentId: summary.studentId,
+    name: summary.name,
+    enrollment: summary.enrollment,
+    overallAttendance: summary.overallAttendance ?? null,
+    avgAssessmentPerformance: summary.avgAssessmentPerformance ?? null,
+    avgAssignmentCompletion: summary.avgAssignmentCompletion ?? null,
+  };
+}
+
+function adaptBatchAnalytics(batch: BatchAnalyticsApiResponse): BatchAnalytics {
+  return {
+    batch: batch.batch,
+    studentCount: batch.studentCount,
+    avgOverallAttendance: batch.avgOverallAttendance ?? null,
+    avgAssessmentPerformance: batch.avgAssessmentPerformance ?? null,
+    avgAssignmentCompletion: batch.avgAssignmentCompletion ?? null,
+    students: (batch.students ?? []).map(adaptStudentSummary),
+  };
+}
+
+/**
+ * Converts the raw Apps Script section-analytics response into the
+ * frontend's internal model. Components consume `SectionAnalytics` /
+ * `BatchAnalytics` / `StudentSummary` exclusively.
+ */
+export function adaptSectionAnalyticsResponse(
+  response: SectionAnalyticsApiResponse
+): SectionAnalytics {
+  return {
+    batches: (response.batches ?? []).map(adaptBatchAnalytics),
   };
 }

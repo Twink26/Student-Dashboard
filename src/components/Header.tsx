@@ -1,13 +1,22 @@
 import { GraduationCap } from "lucide-react";
 import StudentSearch from "./StudentSearch";
+import ViewToggle from "./ViewToggle";
 
 interface HeaderProps {
+  mode: "student" | "sections";
+  onModeChange: (mode: "student" | "sections") => void;
   onSearch: (studentId: string) => void;
   isLoading: boolean;
   compact?: boolean;
 }
 
-export default function Header({ onSearch, isLoading, compact = false }: HeaderProps) {
+export default function Header({
+  mode,
+  onModeChange,
+  onSearch,
+  isLoading,
+  compact = false,
+}: HeaderProps) {
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-paper/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
@@ -21,11 +30,15 @@ export default function Header({ onSearch, isLoading, compact = false }: HeaderP
           </div>
         </div>
 
-        {compact && (
-          <div className="sm:w-80">
-            <StudentSearch onSearch={onSearch} isLoading={isLoading} compact />
-          </div>
-        )}
+        <div className="flex items-center gap-3">
+          <ViewToggle mode={mode} onChange={onModeChange} />
+
+          {mode === "student" && compact && (
+            <div className="sm:w-80">
+              <StudentSearch onSearch={onSearch} isLoading={isLoading} compact />
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

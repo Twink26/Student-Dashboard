@@ -12,14 +12,17 @@ import AssessmentHistory from "../components/AssessmentHistory";
 import LoadingState from "../components/LoadingState";
 import ErrorState from "../components/ErrorState";
 import EmptyState from "../components/EmptyState";
+import SectionsView from "./SectionsView";
 
 import { fetchStudent, StudentNotFoundError, StudentApiNetworkError } from "../lib/studentApi";
 import { adaptStudentResponse } from "../lib/studentAdapter";
 import type { Student } from "../lib/studentTypes";
 
 type ViewState = "empty" | "loading" | "error" | "ready";
+type Mode = "student" | "sections";
 
 export default function Dashboard() {
+  const [mode, setMode] = useState<Mode>("student");
   const [student, setStudent] = useState<Student | null>(null);
   const [viewState, setViewState] = useState<ViewState>("empty");
   const [errorMessage, setErrorMessage] = useState("");
@@ -28,6 +31,7 @@ export default function Dashboard() {
   const isLoading = viewState === "loading";
 
   const handleSearch = useCallback(async (studentId: string) => {
+    setMode("student");
     setViewState("loading");
     setErrorMessage("");
     setErrorSuggestion(undefined);
@@ -53,14 +57,22 @@ export default function Dashboard() {
     }
   }, []);
 
-  const showHeaderSearch = viewState !== "empty";
+  const showHeaderSearch = mode === "student" && viewState !== "empty";
 
   return (
     <div className="min-h-screen bg-paper">
-      <Header onSearch={handleSearch} isLoading={isLoading} compact={showHeaderSearch} />
+      <Header
+        mode={mode}
+        onModeChange={setMode}
+        onSearch={handleSearch}
+        isLoading={isLoading}
+        compact={showHeaderSearch}
+      />
 
       <main className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-10">
-        {viewState === "empty" && (
+        {mode === "sections" && <SectionsView onSelectStudent={handleSearch} />}
+
+        {mode === "student" && viewState === "empty" && (
           <div className="mx-auto max-w-2xl">
             <div className="text-center">
               <h1 className="font-display text-3xl text-ink sm:text-4xl">Student Analytics Dashboard</h1>
@@ -77,13 +89,13 @@ export default function Dashboard() {
           </div>
         )}
 
-        {viewState === "loading" && <LoadingState />}
+        {mode === "student" && viewState === "loading" && <LoadingState />}
 
-        {viewState === "error" && (
+        {mode === "student" && viewState === "error" && (
           <ErrorState message={errorMessage} suggestion={errorSuggestion} />
         )}
 
-        {viewState === "ready" && student && (
+        {mode === "student" && viewState === "ready" && student && (
           <div className="space-y-8">
             <StudentProfile profile={student.profile} />
 
