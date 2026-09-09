@@ -74,7 +74,7 @@ export default function BatchStudentTable({ students, onSelectStudent }: BatchSt
 
   return (
     <div className="overflow-x-auto rounded-xl border border-line bg-surface">
-      <table className="w-full min-w-[600px] border-collapse text-sm">
+      <table className="w-full min-w-150 border-collapse text-sm">
         <thead>
           <tr className="border-b border-line text-left text-xs text-ink-soft">
             {columns.map((col) => (
